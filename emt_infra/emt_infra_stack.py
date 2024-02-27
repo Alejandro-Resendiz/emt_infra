@@ -1,19 +1,25 @@
 from aws_cdk import (
-    # Duration,
-    Stack,
-    # aws_sqs as sqs,
+    aws_pinpoint as pinpoint,
+    CfnParameter,
+    Stack
 )
 from constructs import Construct
+
 
 class EmtInfraStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # The code that defines your stack goes here
+        ENV_param = CfnParameter(
+            self, 'ENVNameParam',
+            type='String',
+            default='DEV',
+            allowed_values=['DEV', 'PROD']
+        )
 
-        # example resource
-        # queue = sqs.Queue(
-        #     self, "EmtInfraQueue",
-        #     visibility_timeout=Duration.seconds(300),
-        # )
+        pinpoint.CfnApp(
+            self, 'EMTPinpointApp',
+            name=f'EMTPinpointApp{ENV_param.value_as_string}'
+        )
+
