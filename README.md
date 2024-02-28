@@ -56,3 +56,8 @@ command.
  * `cdk docs`        open CDK documentation
 
 Enjoy!
+
+
+
+<!-- https://docs.aws.amazon.com/pinpoint/latest/developerguide/tutorials-using-postman.html -->
+<!-- https://docs.aws.amazon.com/cdk/v2/guide/stack_how_to_create_multiple_stacks.html -->

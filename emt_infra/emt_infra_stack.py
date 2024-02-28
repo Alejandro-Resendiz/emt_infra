@@ -22,4 +22,23 @@ class EmtInfraStack(Stack):
             self, 'EMTPinpointApp',
             name=f'EMTPinpointApp{ENV_param.value_as_string}'
         )
+        # TODO: Get Pinpoint Application ID from console
 
+        # TODO: Remove if not needed
+        # emt_campaigns_table_name = f'EMTRestApiTable{ENV_param.value_as_string}'
+        # emt_campaigns_table = dynamodb.Table(
+        #     self, 'EMTRestApiTable',
+        #     table_name=emt_campaigns_table_name,
+        #     partition_key=dynamodb.Attribute(
+        #         name='campaign_id',
+        #         type=dynamodb.AttributeType.STRING
+        #     ),
+        #     billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST
+        # )
+
+        # CfnOutput(
+        #     self,
+        #     id='EMTCampaignsTableName',
+        #     value=emt_campaigns_table.table_name,
+        #     description='Pinpoint API URL'
+        # )
