@@ -1,44 +1,29 @@
 from aws_cdk import (
     aws_pinpoint as pinpoint,
+    aws_s3 as s3,
     CfnParameter,
+    RemovalPolicy,
     Stack
 )
-from constructs import Construct
+from typing import Dict
 
 
-class EmtInfraStack(Stack):
+def build_stack(
+    stack: Stack,
+    stack_context: Dict[str, str],
+    stack_params: Dict[str, CfnParameter]
+) -> None:
 
-    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
-        super().__init__(scope, construct_id, **kwargs)
+    pinpoint.CfnApp(
+        stack, 'EMTPinpointApp',
+        name=f'''EMTPinpointApp{stack_context['ENV']}'''
+    )
+    # TODO - IN CONSOLE: Get Pinpoint Application ID
 
-        ENV_param = CfnParameter(
-            self, 'ENVNameParam',
-            type='String',
-            default='DEV',
-            allowed_values=['DEV', 'PROD']
-        )
-
-        pinpoint.CfnApp(
-            self, 'EMTPinpointApp',
-            name=f'EMTPinpointApp{ENV_param.value_as_string}'
-        )
-        # TODO: Get Pinpoint Application ID from console
-
-        # TODO: Remove if not needed
-        # emt_campaigns_table_name = f'EMTRestApiTable{ENV_param.value_as_string}'
-        # emt_campaigns_table = dynamodb.Table(
-        #     self, 'EMTRestApiTable',
-        #     table_name=emt_campaigns_table_name,
-        #     partition_key=dynamodb.Attribute(
-        #         name='campaign_id',
-        #         type=dynamodb.AttributeType.STRING
-        #     ),
-        #     billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST
-        # )
-
-        # CfnOutput(
-        #     self,
-        #     id='EMTCampaignsTableName',
-        #     value=emt_campaigns_table.table_name,
-        #     description='Pinpoint API URL'
-        # )
+    s3.Bucket(
+        stack, "EMTS3Bucket",
+        bucket_name=stack_params['S3BucketName'].value_as_string,
+        encryption=s3.BucketEncryption.S3_MANAGED,
+        removal_policy=RemovalPolicy.DESTROY
+    )
+    # TODO - IN CONSOLE: grant_public_access() to bucket objects

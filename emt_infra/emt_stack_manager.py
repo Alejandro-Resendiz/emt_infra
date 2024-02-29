@@ -6,7 +6,9 @@ from constructs import Construct
 from emt_infra.emt_backend_stack import (
     build_stack as build_backend_stack
 )
-# from emt_infra_stack import build_stack as build_infra_stack
+from emt_infra.emt_infra_stack import (
+    build_stack as build_infra_stack
+)
 
 
 class EmtStackManager(Stack):
@@ -18,6 +20,7 @@ class EmtStackManager(Stack):
 
         # Stack Environment
         ENV_CTX = scope.node.get_context("env")
+        env_ctx = ENV_CTX.lower()
 
         # Stack Parameters
         # TODO - Remove Role Name
@@ -27,9 +30,23 @@ class EmtStackManager(Stack):
             default='LambdaPinpointRole'
         )
 
+        S3_BUCKET_NAME_PARAM = CfnParameter(
+            self, 'S3BucketName',
+            type='String',
+            default=f'emt-s3-bucket-{env_ctx}'
+        )
+
         # Stacks
         if selected_stack == "infra":
-            pass
+            build_infra_stack(
+                self,
+                stack_context={
+                    'ENV': ENV_CTX,
+                },
+                stack_params={
+                    'S3BucketName': S3_BUCKET_NAME_PARAM
+                }
+            )
         elif selected_stack == "backend":
             build_backend_stack(
                 self,
@@ -38,5 +55,6 @@ class EmtStackManager(Stack):
                 },
                 stack_params={
                     'LambdaRoleName': LAMBDA_ROLE_NAME_PARAM,
+                    'S3BucketName': S3_BUCKET_NAME_PARAM
                 }
             )
