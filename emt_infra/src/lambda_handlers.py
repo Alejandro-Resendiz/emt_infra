@@ -19,22 +19,12 @@ def email_handler(event, context):
       - payload: a JSON object containing parameters to pass to the 
                  operation being performed
     '''
-    # method = event["httpMethod"]
     routeKey = event["routeKey"]
-
     router = {
         'POST /email': create_email_handler,
         'GET /email': get_email_handler,
     }
 
-    # if method == "OPTIONS":
-    #     return {
-    #         "statusCode": 200,
-    #         "headers": get_response_headers(),
-    #         "body": None,
-    #         "isBase64Encoded": False
-    #     }
-    # el
     if routeKey in router:
         return router[routeKey](event)
     else:
@@ -54,21 +44,12 @@ def file_handler(event, context):
       - payload: a JSON object containing parameters to pass to the 
                  operation being performed
     '''
-    # method = event["httpMethod"]
     routeKey = event["routeKey"]
-
     router = {
         'POST /file': create_file_handler,
         'DELETE /file/{key}': delete_file_handler,
     }
-    # if method == "OPTIONS":
-    #     return {
-    #         "statusCode": 200,
-    #         "headers": get_response_headers(),
-    #         "body": None,
-    #         "isBase64Encoded": False
-    #     }
-    # el
+
     if routeKey in router:
         return router[routeKey](event)
     else:

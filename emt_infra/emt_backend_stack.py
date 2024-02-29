@@ -90,11 +90,6 @@ def build_stack(
         methods=[apigwv2.HttpMethod.GET],
         integration=emt_email_integration,
     )
-    # emt_api.add_routes(
-    #     path="/email",
-    #     methods=[apigwv2.HttpMethod.OPTIONS],
-    #     integration=emt_email_integration,
-    # )
     emt_api.add_routes(
         path="/file",
         methods=[apigwv2.HttpMethod.POST],

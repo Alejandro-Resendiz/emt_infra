@@ -25,6 +25,7 @@ def do_create(event):
         email_to_addresses = payload['to']
         email_subject = payload['subject']
         email_body = payload['body']
+        file_url = payload['file_url'] 
 
         response = pinpoint_client.send_messages(
             ApplicationId=PINPOINT_APP_ID,
@@ -37,8 +38,10 @@ def do_create(event):
                         "FromAddress": email_from,
                         "SimpleEmail": {
                             "Subject": {"Charset": CHAR_SET, "Data": email_subject},
-                            "HtmlPart": {"Charset": CHAR_SET, "Data": email_body},
-                            # "TextPart": {"Charset": CHAR_SET, "Data": email_body},
+                            # TODO: Fix File URL. Currently building html part on Frontend
+                            # "HtmlPart": {"Charset": CHAR_SET, "Data": """"<html><head><\/head><body>><p>Your file is <a href='{file_url}'>Here<\/a>.<\/p><\/body><\/html>\""""},
+                            "HtmlPart": {"Charset": CHAR_SET, "Data": email_body}
+                            # "TextPart": {"Charset": CHAR_SET, "Data": email_body}
                         },
                     }
                 },
@@ -68,6 +71,22 @@ def query_get(event):
             ApplicationId=PINPOINT_APP_ID,
             KpiName="txn-emails-clicked"
         )
+        delivered_response = pinpoint_client.get_application_date_range_kpi(
+            ApplicationId=PINPOINT_APP_ID,
+            KpiName="txn-emails-delivered"
+        )
+        open_response = pinpoint_client.get_application_date_range_kpi(
+            ApplicationId=PINPOINT_APP_ID,
+            KpiName="txn-emails-opened"
+        )
+        sent_response = pinpoint_client.get_application_date_range_kpi(
+            ApplicationId=PINPOINT_APP_ID,
+            KpiName="txn-emails-sent"
+        )
+        spam_response = pinpoint_client.get_application_date_range_kpi(
+            ApplicationId=PINPOINT_APP_ID,
+            KpiName="txn-emails-complaint-rate"
+        )
     except ClientError as e:
         logger.exception(e)
 
@@ -81,7 +100,11 @@ def query_get(event):
             "headers": get_response_headers(),
             "body": json.dumps(
                 {"data": {
-                    "emails-clicked": click_response["ApplicationDateRangeKpiResponse"]["KpiResult"]
+                    "clicked": click_response["ApplicationDateRangeKpiResponse"]["KpiResult"],
+                    "delivered": delivered_response["ApplicationDateRangeKpiResponse"]["KpiResult"],
+                    "opened": open_response["ApplicationDateRangeKpiResponse"]["KpiResult"],
+                    "sent": sent_response["ApplicationDateRangeKpiResponse"]["KpiResult"],
+                    "spam": spam_response["ApplicationDateRangeKpiResponse"]["KpiResult"]
                 }},
                 cls=EmtJsonEncoder
             )
